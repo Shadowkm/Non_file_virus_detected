@@ -3,7 +3,6 @@
 
 # # 從這裡跑到full merge結束（day之前，day不跑）
 
-# In[1]:
 
 
 from os import listdir
@@ -21,103 +20,20 @@ testpath="/data/examples/trend/data/testing-set.csv"
 #mypath="data/examples/trend/query_log" 看一下目錄對不對
 
 
-# In[2]:
-
-
-# Data_log=pd.DataFrame()
-# # B=np.array(["0301.csv","0302.csv"])
-# # for filename in B:
-
-# for filename in listdir(mypath):
-#     Data_all=pd.read_csv(os.path.join(mypath,filename),names=["FileID","CustomerID","QueryTs","ProductID"],
-#                         low_memory=False)
-#     Data_log=pd.concat([Data_log,Data_all],ignore_index=True)
-
-
-# In[3]:
 
 
 Data_log=pd.DataFrame()
-# B=np.array(["0301.csv","0302.csv"])
-# # for filename in B:
-# f=pd.concat
-# for filename in listdir(mypath):
-#     Data_log=f([Data_log,pd.read_csv(os.path.join(mypath,filename),names=["FileID","CustomerID","QueryTs","ProductID"],
-#                         low_memory=False)],ignore_index=True)
-
-
-# In[4]:
 
 
 Data_log=pd.concat([pd.read_csv(os.path.join(mypath,file_name),header=None) for file_name in listdir(mypath)],ignore_index=True)
 
 
-# In[293]:
-
-
 Data_log.columns=["FileID","CustomerID","QueryTs","ProductID"]
 
-
-# In[294]:
-
-
-# Data_log.head()
-
-
-# In[295]:
-
-
-# for i in [0,1,3]:
-#     df[i] = df[i].astype('category')
-#     print(df.info())
-
-
-# In[296]:
-
-
 Data_log.info()
-
-
-# In[297]:
-
 
 for i in ['FileID','CustomerID','ProductID']:
     Data_log[i]=Data_log[i].astype('category')
-
-
-# In[298]:
-
-
-Data_log.info()
-
-
-# In[299]:
-
-
-# Data_log = Data_log.sort_values(by='QueryTs').reset_index(drop=True)
-
-
-# In[300]:
-
-
-# Data_log["CustomerID"].describe()
-# 可以討論CustomerID frequency
-
-
-# In[301]:
-
-
-# df[2] = pd.to_datetime(df[2], unit='s')
-
-
-# In[302]:
-
-
-# Data_log.head()
-
-
-# In[303]:
-
 
 time_cal=Data_log["QueryTs"]
 ori_time=1488326400 #1488326400 3/1 0:00
@@ -130,10 +46,6 @@ thrity_second = np.floor((time_cal-ori_time)/(30))
 six_hour=np.floor((time_cal-ori_time)/(6*60*60))
 # 1488326400 為3/1的0:00
 
-
-# In[304]:
-
-
 Data_log["Day"]=day
 Data_log["Week"]=week
 Data_log["Hour"]=hour
@@ -141,36 +53,11 @@ Data_log["minute"]=minute
 Data_log["ten_second"]=ten_second
 Data_log["thirty_second"]=thrity_second
 Data_log["six_hour"]=six_hour
-
-
-
-# In[305]:
-
-
 Data_log.head()
-
-
-# In[306]:
-
-
-# df=pd.DataFrame(Data_log[Data_log["CustomerID"]=="282396145a3df4452761bacf8049f6db"]).sort_values()
-
-
-# In[307]:
-
 
 file_list=[]
 for filename in listdir(mypath):
     file_list.append(filename)
-print (file_list)
-print (len(file_list))
-
-
-# In[308]:
-
-
-import time 
-from datetime import datetime
 
 
 # In[309]:
@@ -181,145 +68,25 @@ train=pd.read_csv(trainpath,names=["FileID","Detected"])
 test=pd.read_csv(testpath,names=["FileID","Detected"])
 
 
-# In[310]:
-
-
-# test['Detected']=np.nan
-
-
-# In[311]:
-
-
-# 驗證
-# Data_log[Data_log.FileID.isin(train.FileID)]
-
-
-# In[312]:
-
-
-# # check for missing value
-# data_df_na = Data_log.isnull().mean(axis=0)
-# data_df_na = data_df_na.drop(data_df_na[data_df_na == 0].index).sort_values(ascending=False)
-# missing_data = pd.DataFrame({'Missing Data Ratio': data_df_na})
-# print('data_df_na.shape = ', data_df_na.shape)
-
-
-# In[313]:
-
-
-import time 
-from datetime import datetime
-
 TIME=[]
 Day=[]
 Hour=[]
 unix_time=Data_log["QueryTs"]
 
 
-# In[314]:
-
-
-# Train_merge = pd.merge(Data_log, train, how="inner", on='FileID')
-# Test_merge = pd.merge(Data_log, test, how="inner", on='FileID')
-# full_data
-
-
-# In[315]:
-
-
 full_data= pd.concat([train, test])
-
-
-# In[316]:
-
-
-# full_data
-
-
-# In[317]:
-
 
 full_merge = pd.merge(Data_log, full_data, how="inner", on='FileID')
 
-
-# In[318]:
-
-
 full_merge['Detected']=full_merge['Detected'].replace(0.5, 0.5)
-
-
-# In[319]:
-
 
 del Data_log,full_data
 
-
-# In[320]:
-
-
 full_merge.head()
-
-
-# In[321]:
-
 
 from gensim.models import Word2Vec
 
-
-# In[322]:
-
-
-# def sum_up(grp):
-#     print (len(grp))
-#     x=len(grp)
-#     return np.diff(x)
-# def sum_down(grp):
-   
-#     return grp[(len(grp<2))]
-# def over_200_up(grp):
-#     return np.sum(grp)
-
-
-# In[323]:
-
-
-# train_diff_D_mean=train_draw.set_index('FileID').groupby(level=0)['Detected'].agg({sum_up})
-
-
-# In[324]:
-
-
-full_merge.columns
-
-
-# In[37]:
-
-
-# full_merge.groupby(["FileID","Day"])['QueryTs'].count()
-
-
-# In[38]:
-
-
-# train_draw.head()
-
-
-# In[39]:
-
-
-# train_draw[train_draw['FileID']=='00008c73ee43c15b16c26b26398c1577']['Day']
-
-
-# # 從這裡開始跟時間有關的都不用跑，已經有另外把相關的feature存起來了，直接跳到“Product ID feature”
-# # Day
-
-# In[36]:
-
-
 train_draw=pd.DataFrame(full_merge.groupby(["FileID","Day"])["Detected"].count()).reset_index()
-
-
-# In[37]:
 
 
 train_d_mean=train_draw.set_index('FileID').groupby(level=0)['Detected'].agg({np.mean,np.min,np.max,np.std}).reset_index()
@@ -328,23 +95,8 @@ train_d_mean.fillna(0,inplace=True)
 train_d_cumsum.fillna(0,inplace=True)
 
 
-# In[38]:
-
 
 train_d_mean.isnull().any()
-# train_exp.isnull().any()
-# train_log.isnull().any()
-# train_d_cumsum.isnull().any()
-
-
-# In[39]:
-
-
-# train_diff_D=train_draw.set_index('FileID').groupby(level=0)['Day'].transform(lambda x : np.diff(x)).reset_index()
-
-
-# In[40]:
-
 
 train_diff_D_mean=train_draw.set_index('FileID').groupby(level=0)['Day'].transform(lambda x : np.sum(np.diff(x))/(len(x)-1) if len(x)>1 
                                                                                    else np.diff(x)/(len(x))).groupby(level=0).first()
@@ -352,76 +104,25 @@ train_diff_D_mean=train_draw.set_index('FileID').groupby(level=0)['Day'].transfo
 train_diff_D_std=train_draw.set_index('FileID').groupby(level=0)['Day'].transform(lambda x : np.mean(np.diff(x)) if len(x)>1 
                                                                                    else np.diff(x)==0).groupby(level=0).first()
 
-
-# In[41]:
-
-
-train_diff_D_mean.head()
-
-
-# In[42]:
-
-
 train_diff_D_max=train_draw.set_index('FileID').groupby(level=0)['Day'].transform(lambda x : np.max(np.diff(x))/(len(x)-1) if len(x)>1 
                                                                                    else np.diff(x)/(len(x))).groupby(level=0).first()
 train_diff_D_min=train_draw.set_index('FileID').groupby(level=0)['Day'].transform(lambda x : np.min(np.diff(x))/(len(x)-1) if len(x)>1 
                                                                                    else np.diff(x)/(len(x))).groupby(level=0).first()
-
-
-# In[43]:
-
-
-# train_diff_D_min.reset_index().groupby(["FileID"]).mean().reset_index()
-
-
-# In[44]:
-
-
-
 train_avg_D1=train_diff_D_mean.reset_index().groupby(["FileID"]).mean().reset_index()
 train_avg_D2=train_diff_D_std.reset_index().groupby(["FileID"]).mean().reset_index()
 train_avg_D4=train_diff_D_max.reset_index().groupby(["FileID"]).mean().reset_index()
 train_avg_D5=train_diff_D_min.reset_index().groupby(["FileID"]).mean().reset_index()
 
-
-# In[45]:
-
-
 del train_draw,train_diff_D_mean,train_diff_D_std,train_diff_D_max,train_diff_D_min
-
-
-# In[ ]:
-
-
-# full_merge=full_merge.sort_values('QueryTs')
-
-
-# In[122]:
-
 
 train_draw_dy=full_merge.groupby(["FileID","Day"])['QueryTs'].count().reset_index()
 
-
-# In[123]:
 
 
 train_draw_dy.index=train_draw_dy['FileID'].values
 
 
-# In[124]:
-
-
 train_draw_d=pd.DataFrame(train_draw_dy.groupby(["FileID"])["Day"].agg({'mean','min','max','std',lambda x : [np.percentile(x,99),np.percentile(x,1)]}).reset_index())
-
-
-# In[4]:
-
-
-train_draw_d.head()
-
-
-# In[126]:
-
 
 XC=[train_draw_d['<lambda>'][i][j] for j in range(2) for i in range(len(train_draw_d)) ]
 train_draw_d['DD_99']=XC[:len(train_draw_d)]
@@ -455,14 +156,6 @@ train_diff_D_Dmean=train_draw_dy.groupby('FileID')['Day'].transform(lambda x : n
                                                                                    else np.diff(x)/(len(x))).groupby(level=0).first().reset_index().rename(columns={"index": "FileID"})
 
 
-# In[131]:
-
-
-# train_diff_D_max.head()
-
-
-# In[132]:
-
 
 train_diff_D_Dmax=train_draw_dy.groupby('FileID')['Day'].transform(lambda x : np.max(np.diff(x))/(len(x)-1) if len(x)>1 
                                                                                    else np.diff(x)/(len(x))).groupby(level=0).first().reset_index().rename(columns={"index": "FileID"})
@@ -476,22 +169,7 @@ train_diff_D_Dmin=train_draw_dy.groupby('FileID')['Day'].transform(lambda x : np
 del train_draw_dy
 
 
-# In[134]:
-
-
-train_diff_D_Dstd.shape
-
-
-# # Hour
-# 
-
-# In[46]:
-
-
 train_draw1=pd.DataFrame(full_merge.groupby(["FileID","Hour"])["Detected"].count()).reset_index()
-
-
-# In[47]:
 
 
 train_h_mean=train_draw1.set_index('FileID').groupby(level=0)['Detected'].agg({np.mean,np.min,np.max,np.std}).reset_index()
@@ -570,21 +248,6 @@ train_draw_h['DD_01']=XA[len(train_draw_h):]
 train_draw_h=train_draw_h.drop(['<lambda>'],axis=1)
 
 
-# ##### 需要設置INDEX，才會有FILEID
-
-# In[146]:
-
-
-train_draw_hr.index=train_draw_hr['FileID'].values
-
-
-# In[147]:
-
-
-# train_draw_hr.head()
-
-
-# In[148]:
 
 
 train_diff_h_hstd=train_draw_hr.groupby(level=0)['Hour'].transform(lambda x : np.std(np.diff(x))/(len(x)-1) if len(x)>1 
@@ -604,16 +267,6 @@ train_diff_h_hmin=train_draw_hr.groupby(level=0)['Hour'].transform(lambda x : np
 Train=pd.read_csv('Trend_temp.csv',index_col =0)
 
 
-# In[92]:
-
-
-Train['FileID'].unique
-
-
-# # Minute
-
-# In[53]:
-
 
 train_draw2=pd.DataFrame(full_merge.groupby(["FileID","minute"])["Detected"].count()).reset_index()
 
@@ -631,22 +284,10 @@ train_m_mean.fillna(0,inplace=True)
 train_m_cumsum.fillna(0,inplace=True)
 
 
-# In[55]:
-
-
-train_m_cumsum.isnull().any()
-
-
-# In[56]:
-
-
 train_diff_m_mean=train_draw2.set_index('FileID').groupby(level=0)['minute'].transform(lambda x : np.sum(np.diff(x))/(len(x)-1) if len(x)>1 
                                                                                    else np.diff(x)/(len(x))).groupby(level=0).first()
 train_diff_m_std=train_draw2.set_index('FileID').groupby(level=0)['minute'].transform(lambda x : np.std(np.diff(x)) if len(x)>1 
                                                                                    else np.diff(x)==0).groupby(level=0).first()
-
-
-# In[57]:
 
 
 train_diff_m_max=train_draw2.set_index('FileID').groupby(level=0)['minute'].transform(lambda x : np.max(np.diff(x))/(len(x)-1) if len(x)>1 
@@ -691,21 +332,10 @@ train_diff_m_mmin=train_draw_mn.groupby('FileID')['minute'].transform(lambda x :
                                                                                    else np.diff(x)/(len(x))).groupby(level=0).first().reset_index().rename(columns={"index": "FileID"})
 
 
-# In[158]:
-
-
-# train_diff_m_mstd
-
-
-# # Second
-
-# In[ ]:
-
 
 train_draw3=pd.DataFrame(full_merge.groupby(["FileID","QueryTs"])["Detected"].count()).reset_index()
 
 
-# In[ ]:
 
 
 train_s_mean=train_draw3.set_index('FileID').groupby(level=0)['Detected'].agg({np.mean,np.min,np.max,np.std}).reset_index()
@@ -1183,51 +813,7 @@ train_diff_6h_hmin=train_draw_6hr.groupby('FileID')['six_hour'].transform(lambda
 
 
 
-# In[210]:
-
-
 del XA,train_draw_6hr
-
-
-# In[211]:
-
-
-train_diff_6h_hmin.head()
-
-
-# In[ ]:
-
-
-# train_draw['Detected'].sum()
-
-
-# In[ ]:
-
-
-# testt=train_draw5.values
-
-
-# In[ ]:
-
-
-# try:
-#     train_draw=train_draw.drop(['level_0'],axis=1)
-#     train_draw=train_draw.drop(['index'],axis=1)
-# except:
-#     print ("ok")
-    
-
-
-# In[ ]:
-
-
-
-# train_avg_m1、train_avg_S1、train_avg_10S1、train_avg_cus1、train_avg_30S1、train_avg_6H1
-
-
-# ## ProductID
-
-# In[38]:
 
 
 train_draw_pd=full_merge.groupby(["FileID","ProductID"])['QueryTs'].count().reset_index()
@@ -1373,25 +959,6 @@ temp.to_csv("Trend_temp.csv")
 #          train_avg_30S1,train_avg_30S2,train_avg_6H1,train_avg_6H2,train_avg_cus1,train_avg_cus2 ]
 
 
-# In[241]:
-
-
-# f_list =[train_d_mean,train_d_cumsum,
-#          train_h_mean,train_h_cumsum,
-#          train_m_mean,train_m_cumsum,
-#          train_s_mean,train_s_cumsum,
-#          train_10s_mean,train_10s_cumsum,
-#          train_30s_mean,train_30s_cumsum,
-#          train_6h_mean,train_6h_cumsum,
-#          train_customer_mean,train_customer_cumsum,
-#          train_avg_D1, train_avg_D2, train_avg_h1, train_avg_h2 , train_avg_m1, 
-#          train_avg_m2, train_avg_S1, train_avg_S2, train_avg_10S1 , train_avg_10S2,
-#          train_avg_30S1,train_avg_30S2,train_avg_6H1,train_avg_6H2,train_avg_cus1,train_avg_cus2 ]
-
-
-# In[270]:
-
-
 temp.columns[:5]
 
 
@@ -1433,49 +1000,11 @@ temp.columns=["FileID","d_std", "d_mean","d_max","d_min","d_cumsum_std","d_cumsu
               "train_diff_30s_sstd","train_diff_30s_smean","train_diff_30s_smax","train_diff_30s_smin",
               "train_draw_6h1","train_draw_6h2","train_draw_6h3","train_draw_6h4","train_draw_6h5","train_draw_6h6",
               "train_diff_6h_hstd","train_diff_6h_hmean","train_diff_6h_hmax","train_diff_6h_hmin","train_draw_pp" ]
-#"train_customer4","train_customer5","train_customer6",
-
-
-# In[272]:
-
-
-temp.fillna(0,inplace=True)
-
-
-# In[273]:
-
-
-temp.to_csv("Trend_temp.csv")
-
-
-# # Product ID Feature （full merge完了以後直接接這個）
-# # run from here 3/19
-
-# In[325]:
-
-
-temp=pd.read_csv('Trend_temp_0317.csv')
-
-
-# In[326]:
-
 
 temp=temp.drop(['Unnamed: 0'],axis=1)
 
-
-# In[327]:
-
-
-temp.head()
-
-
-# In[328]:
-
-
 full_merge['ProductID']=full_merge['ProductID'].astype(str)
 
-
-# In[329]:
 
 
 temp=temp.loc[:,["FileID",
@@ -1497,79 +1026,14 @@ temp=temp.loc[:,["FileID",
               "train_diff_6h_hstd","train_diff_6h_hmean","train_diff_6h_hmax","train_diff_6h_hmin","train_draw_pp"]]
 
 
-# In[330]:
-
-
-temp.head()
-
-
-# In[331]:
-
-
-# def single_max(ci):
-#     return ci.value_counts().max() 
-# def positive_mean(ci): 
-#     cnt = ci.value_counts() 
-#     return cnt[cnt>0].mean() 
-
-# pivot_ci = full_merge.pivot_table(values='CustomerID', columns='ProductID', index=['FileID'], aggfunc=[pd.Series.count, pd.Series.nunique, single_max, positive_mean]) 
-
-# pivot_ci.columns = pd.MultiIndex.from_tuples([('ci_'+x,y) for (x,y) in pivot_ci.columns.ravel()]) 
-# pivot_ci.fillna(0, inplace=True) 
-# pivot_ci.head(3) 
-# print('CustomerID pivot done.')
-
-
-# In[332]:
-
-
-# pivot_ci.to_csv('pivot.csv')
-
-
-# In[333]:
-
-
-# pivot_ci.columns=pd.Index([e[0] + e[1] for e in pivot_ci.columns.tolist()]) 
-
-
-# In[334]:
-
-
-# pivot_ci=pivot_ci.reset_index()
-
-
-# In[335]:
-
-
 pivot_0=pd.read_csv('pivot.csv',index_col=0)
-
-
-# In[336]:
 
 
 if 'Unnamed: 0' in pivot_0.columns:
     pivot_0=pivot_0.drop(['Unnamed: 0'],axis=1)
 
 
-# In[337]:
-
-
-pivot_0.head()
-
-
-# In[47]:
-
-
 R=pivot_0.sum(axis=0)
-
-
-# In[93]:
-
-
-R[R.index[1]]
-
-
-# In[51]:
 
 
 T=pd.DataFrame()
@@ -1577,78 +1041,16 @@ for u in range(1,len(R.index)):
     T[u]=(pivot_0.iloc[:,[u]]/R[R.index[u]])
 
 
-# In[ ]:
-
-
-T.shape
-# pivot_0.sum(axis=1)
-
-
-# In[338]:
-
-
 feature = pd.pivot_table(full_merge[['FileID','ProductID']], index =['FileID'], columns= ['ProductID'], aggfunc=len,)
 
-
-# In[339]:
 
 
 feature.fillna(0,inplace=True)
 
-
-# In[340]:
-
-
-# F=feature.sum(axis=0)
-
-
-# In[ ]:
-
-
-# T=pd.DataFrame()
-# for u in range(1,len(R.index)):
-#     T[u]=(feature.iloc[:,[u]]/R[R.index[u]])
-
-
-
-# In[ ]:
-
-
 feature['FileID'] = feature.index
 
 
-# In[50]:
 
-
-# train_multi_merge=train_custome.columns.values
-
-
-# In[51]:
-
-
-# temp1=pd.merge(feature,train_customer,on='FileID' , how ='inner')
-
-
-# In[52]:
-
-
-# temp2=pd.merge(temp1,train_avg_cus1,on='FileID' , how ='inner')
-
-
-# # Week、Day
-# # 先不要跑王董的
-
-# In[44]:
-
-
-
-#training set time label
-# full_merge["QueryTs_hr"] =full_merge["QueryTs"].map(lambda x: datetime.datetime.fromtimestamp(x).strftime('%H'))
-# full_merge["QueryTs_week"] =full_merge["QueryTs"].map(lambda x: datetime.datetime.fromtimestamp(x).isoweekday())
-
-
-#Create training set
-# ProductID_arr = pd.crosstab(full_merge.FileID,full_merge.ProductID, margins=False)
 Hour_arr = pd.crosstab(full_merge.FileID,full_merge.Hour, margins=False)
 Week_arr = pd.crosstab(full_merge.FileID,full_merge.Week, margins=False)
 
